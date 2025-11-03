@@ -1,34 +1,13 @@
-# Librerías principales
-streamlit==1.32.0
+# Dependencias principales
+streamlit==1.39.0
 plotly==5.24.1
-pandas==2.2.2
+pandas==2.2.3
 numpy==1.26.4
 yfinance==0.2.43
 requests==2.32.3
-reportlab==4.2.2
-
-# Soporte general y análisis
 beautifulsoup4==4.12.3
-openpyxl==3.1.2
-pillow==10.3.0
-tenacity==8.2.3
-altair==5.2.0
-protobuf==4.25.3
-python-dateutil==2.9.0.post0
-pytz==2024.1
-urllib3==2.2.2
-typing_extensions==4.11.0
-tornado==6.4
-Jinja2==3.1.4
-MarkupSafe==2.1.5
-idna==3.6
-certifi==2024.2.2
+openpyxl==3.1.5
+pillow==10.4.0
 
-# Opcionales (solo si tu código los necesita)
-jsonschema==4.22.0
-attrs==23.2.0
-packaging==24.1
-cachetools==5.3.3
-blinker==1.8.2
-click==8.1.7
-six==1.16.0
+# Reportes PDF (opcional, si usas reportlab)
+reportlab==4.2.2
