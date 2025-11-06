@@ -11,27 +11,27 @@ def crear_graficos(df: pd.DataFrame, ticker: str):
         st.warning("No hay datos para graficar.")
         return None
 
-    # Columna segura: se ajusta según los nombres reales de Yahoo Finance
-    if "Adj Close" in df.columns:
-        y_col = "Adj Close"
-        precio_label = "Precio Ajustado"
-    elif "Close" in df.columns:
-        y_col = "Close"
-        precio_label = "Precio Cierre"
-    else:
-        st.error("No se encontró columna 'Close' ni 'Adj Close' en los datos.")
+    # --- Seleccionar columna de precio de cierre ---
+    if "Close" not in df.columns:
+        st.error("No se encontró columna 'Close' en los datos descargados.")
         return None
 
+    # --- Gráfico de precios ---
     fig_precio = px.line(
-        df, x="Date", y=y_col,
-        title=f"{ticker} - {precio_label} Últimos {len(df)} Días",
-        labels={y_col: precio_label, "Date": "Fecha"}
+        df,
+        x="Date",
+        y="Close",
+        title=f"{ticker.upper()} - Precio de Cierre (Últimos {len(df)} días)",
+        labels={"Close": "Precio de Cierre", "Date": "Fecha"}
     )
 
+    # --- Gráfico de retornos ---
     if "Return" in df.columns:
         fig_retorno = px.bar(
-            df, x="Date", y="Return",
-            title=f"{ticker} - Retornos Diarios (%)",
+            df,
+            x="Date",
+            y="Return",
+            title=f"{ticker.upper()} - Retornos Diarios (%)",
             labels={"Return": "Retorno (%)", "Date": "Fecha"}
         )
     else:
@@ -39,18 +39,18 @@ def crear_graficos(df: pd.DataFrame, ticker: str):
 
     return {"precio": fig_precio, "retorno": fig_retorno}
 
+
 def ejecutar_dashboard():
     st.set_page_config(page_title="Analizador Financiero", layout="wide")
-    st.title("📊 Analizador de Datos Financieros con Python")
-    st.markdown("Visualiza datos históricos exactos según los días seleccionados.")
+    st.title("📊 Analizador de Datos Financieros")
+    st.markdown("Visualiza y analiza precios históricos de activos financieros en segundos.")
 
     ticker = st.text_input("Introduce el símbolo del activo (ej: AAPL, TSLA, MSFT):", "AAPL")
-    dias = st.slider("Número de días a analizar (mínimo 7):", 7, 365*5, value=7, step=1)
+    dias = st.slider("Número de días a analizar:", 7, 365*5, value=365, step=1)
 
     if st.button("Cargar y Analizar Ahora") and ticker:
         try:
-            # Descargar datos suficientes para cubrir días hábiles
-            df = cargar_datos(ticker, dias=dias*2)
+            df = cargar_datos(ticker, dias=dias)
         except Exception as e:
             st.error(f"No se pudieron obtener datos: {e}")
             return
@@ -59,10 +59,7 @@ def ejecutar_dashboard():
             st.error("No se pudieron obtener datos para el ticker ingresado.")
             return
 
-        # Tomar solo los últimos N días
-        df = df.tail(dias)
-
-        # Mostrar tabla
+        # Mostrar datos
         st.subheader(f"📋 Datos de los últimos {dias} días")
         st.dataframe(df)
 
@@ -76,12 +73,13 @@ def ejecutar_dashboard():
             st.warning("No se pudieron calcular estadísticas.")
 
         # Gráficos
-        st.subheader("📊 Gráficos")
+        st.subheader("📊 Visualizaciones")
         graficos = crear_graficos(df, ticker)
         if graficos:
             st.plotly_chart(graficos["precio"], use_container_width=True)
             if graficos["retorno"]:
                 st.plotly_chart(graficos["retorno"], use_container_width=True)
+
 
 if __name__ == "__main__":
     ejecutar_dashboard()
